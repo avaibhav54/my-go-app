@@ -1,20 +1,18 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -22,30 +20,7 @@ jobs:
           go-version: 1.20
 
       - name: Build
-        run: |
-          go build -v ./...
+        run: go build -v ./...
 
       - name: Test
-        run: |
-          go test -v ./...
-
-  docker_build:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-go-app:latest
+        run: go test -v ./...
